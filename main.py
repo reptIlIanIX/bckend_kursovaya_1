@@ -1,34 +1,41 @@
 import json
 from datetime import datetime
 
-with open("operations.json", encoding='utf-8') as my_json:
-    json_load = json.load(my_json)
-    new_json = []
-    for item in json_load:
-        if item != {}:
-            new_json.append(item)
+
+def get_data():
+    with open("C:\\Users\\user\\PycharmProjects\\bckend_kursovaya\\operations.json", encoding='utf-8') as my_json:
+        json_load = json.load(my_json)
+    return json_load
 
 
-def executed_json():
-    executed = []
-    for item in new_json:
-        if item["state"] == "EXECUTED":
-            executed.append(item)
-    return executed
+data = get_data()
 
-def date_maker():
-    for item in executed_json():
-        datetime_str = item["date"][:19]
-        datetime_object = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S")
-        item['date'] = datetime_object
-    return executed_json()
+
+def get_filtered_data(data, filter_empty_from=False):
+    data = [x for x in data if "state" in x and x["state"] == "EXECUTED"]
+    if filter_empty_from:
+        data = [x for x in data if "from" in x]
+    return data
+
+
+data_sorted = sorted(get_filtered_data(data), key=lambda x: x["date"], reverse=True)
+
+
+def card_hider():
+    for item in get_filtered_data(data):
+        if 'from' in item:
+            from_item = item.get('from').split()
+            removed_numbers = from_item.pop(-1)
+            sender = ' '.join(from_item)
+        return (f'{sender} {removed_numbers[0:4]} {removed_numbers[4:6]}** **** {removed_numbers[12:16]}')
 
 
 def last_operations():
-    for item in executed_json()[1:5]:
+    for item in data_sorted[1:5]:
         datetime_str = item["date"][:19]
         datetime_object = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S")
         print(
-            f'{datetime_object}: {item["description"]} \n {item.get("from")} -> {item.get("to")}\n {item["operationAmount"]["amount"]} {item["operationAmount"]["currency"]["name"]}')
+            f'{datetime_object}: {item["description"]} \n {card_hider()} -> {item.get("to")[0:4]} **{item.get("to")[5:9]}\n {item["operationAmount"]["amount"]} {item["operationAmount"]["currency"]["name"]}')
+
 
 last_operations()
