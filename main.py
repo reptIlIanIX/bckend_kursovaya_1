@@ -1,9 +1,11 @@
-import json
+import json, os
 from datetime import datetime
+
+p = os.path.abspath('operations.json')
 
 
 def get_data():
-    with open("C:\\Users\\user\\PycharmProjects\\bckend_kursovaya\\operations.json", encoding='utf-8') as my_json:
+    with open(p, encoding='utf-8') as my_json:
         json_load = json.load(my_json)
     return json_load
 

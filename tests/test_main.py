@@ -1,5 +1,4 @@
-from main import get_filtered_data, data, get_data, card_hider, last_operations
-
+from main import get_filtered_data, get_data, data, card_hider, last_operations
 
 def test_get_json():
     assert type(get_data()) == list
